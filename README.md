@@ -1,6 +1,22 @@
 # Superstore Sales Analysis Dashboard
 
-Interactive Streamlit dashboard for analyzing Superstore sales data — top products, monthly revenue, and category profitability.
+An interactive [Streamlit](https://streamlit.io/) dashboard for exploring Superstore sales data — KPIs, top products, monthly revenue trends, and category profitability, all filterable by date, region, and category.
+
+Built with Python, pandas, and Plotly.
+
+## Features
+
+- **KPIs** — total revenue, profit, orders, and average order value, recomputed live as filters change
+- **Top products** — ranked by quantity or sales, with a chart plus a detailed sales/profit table
+- **Monthly revenue** — trend chart with the peak month and revenue highlighted
+- **Category profitability** — profit and margin broken down by category and sub-category
+- **Filters** — order date range, region, and category (sidebar)
+- **Data cleaning summary** — rows removed for duplicates and invalid values, shown in the sidebar
+
+## Requirements
+
+- Python 3.10+ (type hints use 3.10+ syntax)
+- Dependencies pinned in `requirements.txt`: pandas, streamlit, plotly
 
 ## Setup
 
@@ -18,7 +34,7 @@ Download the [Superstore Sales dataset](https://www.kaggle.com/datasets/kyanyoga
 data/superstore.csv
 ```
 
-The file is typically named `Sample - Superstore.csv` — rename it to `superstore.csv` when saving.
+The download is typically named `Sample - Superstore.csv` — rename it to `superstore.csv`. The app shows an in-page message with this link if the file is missing.
 
 ## Run
 
@@ -28,10 +44,13 @@ streamlit run app.py
 
 The dashboard opens at `http://localhost:8501`.
 
-## Features
+## Project structure
 
-- **KPIs:** Total revenue, profit, orders, and average order value
-- **Top products:** Ranked by quantity or sales
-- **Monthly revenue:** Trend chart with peak month highlighted
-- **Category profitability:** Profit and margin by category and sub-category
-- **Filters:** Date range, region, and category
+```
+app.py                 # Streamlit UI: layout, filters, charts
+src/data_loader.py     # CSV loading, cleaning, and cleaning stats
+src/kpis.py            # KPI and aggregation logic (revenue, top products, etc.)
+src/charts.py          # Plotly chart builders
+data/superstore.csv    # Dataset (not committed — download separately)
+requirements.txt
+```
