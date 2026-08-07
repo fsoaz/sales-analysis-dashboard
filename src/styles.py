@@ -1,9 +1,9 @@
-"""SaaS-style design system: palette, global CSS, and reusable UI components.
+"""SalesPulse design system: palette, global CSS, and reusable UI components.
 
 All components render through ``st.html`` (not ``st.markdown``). ``st.html`` skips
 Markdown parsing, so indentation and blank lines can never be misread as a code
-block — the failure mode that previously broke the KPI grid. Dynamic text is
-escaped via ``esc`` to keep the markup well-formed and injection-safe.
+block. Dynamic text is escaped via ``esc`` to keep the markup well-formed and
+injection-safe.
 """
 
 import html as _html
@@ -15,24 +15,27 @@ def esc(value: object) -> str:
     """HTML-escape any value before interpolating it into markup."""
     return _html.escape(str(value), quote=True)
 
-# Brand palette ------------------------------------------------------------
-PRIMARY = "#6366F1"      # indigo
-PRIMARY_DARK = "#4F46E5"
-ACCENT = "#06B6D4"       # cyan
-SUCCESS = "#10B981"
-DANGER = "#EF4444"
-WARNING = "#F59E0B"
-INK = "#0F172A"
-MUTED = "#64748B"
-SURFACE = "#FFFFFF"
-CANVAS = "#F8FAFC"
-BORDER = "#E2E8F0"
 
-# Ordered palette for categorical charts
-CHART_SEQUENCE = ["#6366F1", "#06B6D4", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899"]
+# Brand palette — deep slate + teal (B2B, not indigo SaaS default)
+PRIMARY = "#0F766E"  # teal-700
+PRIMARY_DARK = "#115E59"  # teal-800
+ACCENT = "#0369A1"  # sky-700; readable against white and in the hero gradient
+SUCCESS = "#047857"  # emerald-700; WCAG AA on white
+DANGER = "#DC2626"
+WARNING = "#B45309"  # amber-700; WCAG AA on white
+INK = "#0B1220"
+MUTED = "#5B6B7C"
+SURFACE = "#FFFFFF"
+CANVAS = "#F3F6F8"
+BORDER = "#D8E0E7"
+
+CHART_SEQUENCE = ["#0F766E", "#0369A1", "#047857", "#B45309", "#DC2626", "#334155", "#64748B"]
 
 FONT_STACK = (
-    "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+    "'DM Sans', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+)
+DISPLAY_STACK = (
+    "'Source Serif 4', Georgia, 'Times New Roman', serif"
 )
 
 
@@ -41,7 +44,8 @@ def inject_css() -> None:
     st.html(
         f"""
         <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
         <style>
         :root {{
             --primary: {PRIMARY};
@@ -60,53 +64,53 @@ def inject_css() -> None:
 
         .stApp {{
             background:
-                radial-gradient(1200px 600px at 100% -10%, rgba(99,102,241,0.08), transparent 60%),
-                radial-gradient(900px 500px at -10% 0%, rgba(6,182,212,0.06), transparent 55%),
+                radial-gradient(1100px 520px at 100% -8%, rgba(14,165,233,0.07), transparent 58%),
+                radial-gradient(900px 480px at -8% 4%, rgba(15,118,110,0.08), transparent 55%),
                 {CANVAS};
         }}
 
-        /* Tighten default top padding */
         .block-container {{ padding-top: 2rem; padding-bottom: 3rem; max-width: 1280px; }}
 
-        /* Hide Streamlit chrome for a product feel */
         #MainMenu, footer, header {{ visibility: hidden; }}
 
-        /* Hero -------------------------------------------------------- */
         .hero {{
-            background: linear-gradient(135deg, {PRIMARY} 0%, {PRIMARY_DARK} 55%, {ACCENT} 130%);
-            border-radius: 20px;
+            background: linear-gradient(135deg, {PRIMARY_DARK} 0%, {PRIMARY} 58%, {ACCENT} 140%);
+            border-radius: 18px;
             padding: 28px 32px;
             color: #fff;
-            box-shadow: 0 20px 45px -20px rgba(79,70,229,0.55);
+            box-shadow: 0 18px 40px -22px rgba(15,118,110,0.55);
             margin-bottom: 8px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 16px;
         }}
-        .hero h1 {{ font-size: 1.7rem; font-weight: 800; margin: 0; letter-spacing: -0.02em; color:#fff; }}
-        .hero p {{ margin: 6px 0 0; opacity: 0.9; font-size: 0.95rem; }}
+        .hero h1 {{
+            font-family: {DISPLAY_STACK};
+            font-size: 1.75rem; font-weight: 700; margin: 0;
+            letter-spacing: -0.02em; color:#fff;
+        }}
+        .hero p {{ margin: 6px 0 0; opacity: 0.92; font-size: 0.95rem; }}
         .hero-badge {{
-            background: rgba(255,255,255,0.16);
+            background: rgba(255,255,255,0.14);
             border: 1px solid rgba(255,255,255,0.28);
-            padding: 8px 14px; border-radius: 999px;
+            padding: 8px 14px; border-radius: 8px;
             font-size: 0.8rem; font-weight: 600; white-space: nowrap;
-            backdrop-filter: blur(6px);
         }}
 
-        /* KPI cards --------------------------------------------------- */
         .kpi-grid {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 18px 0 4px; }}
         @media (max-width: 900px) {{ .kpi-grid {{ grid-template-columns: repeat(2, 1fr); }} }}
+        @media (max-width: 520px) {{ .kpi-grid {{ grid-template-columns: 1fr; }} }}
         .kpi-card {{
             background: {SURFACE};
             border: 1px solid {BORDER};
-            border-radius: 16px;
+            border-radius: 14px;
             padding: 18px 18px 16px;
-            box-shadow: 0 1px 2px rgba(15,23,42,0.04), 0 8px 24px -16px rgba(15,23,42,0.18);
+            box-shadow: 0 1px 2px rgba(11,18,32,0.04), 0 8px 24px -16px rgba(11,18,32,0.16);
             transition: transform .15s ease, box-shadow .15s ease;
             position: relative; overflow: hidden;
         }}
-        .kpi-card:hover {{ transform: translateY(-3px); box-shadow: 0 10px 30px -12px rgba(15,23,42,0.25); }}
+        .kpi-card:hover {{ transform: translateY(-2px); box-shadow: 0 10px 28px -14px rgba(11,18,32,0.22); }}
         .kpi-card::before {{
             content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
             background: linear-gradient(180deg, var(--primary), var(--accent));
@@ -114,54 +118,59 @@ def inject_css() -> None:
         .kpi-top {{ display: flex; align-items: center; justify-content: space-between; }}
         .kpi-label {{ color: {MUTED}; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }}
         .kpi-icon {{
-            width: 38px; height: 38px; border-radius: 11px;
-            display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
-            background: rgba(99,102,241,0.10); color: {PRIMARY_DARK};
+            width: 36px; height: 36px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em;
+            background: rgba(15,118,110,0.10); color: {PRIMARY_DARK};
         }}
-        .kpi-value {{ font-size: 1.8rem; font-weight: 800; color: {INK}; margin-top: 10px; letter-spacing: -0.02em; }}
+        .kpi-value {{ font-size: 1.75rem; font-weight: 700; color: {INK}; margin-top: 10px; letter-spacing: -0.02em; }}
         .kpi-delta {{ font-size: 0.82rem; font-weight: 600; margin-top: 4px; display: inline-flex; align-items: center; gap: 4px; }}
         .kpi-delta.up {{ color: {SUCCESS}; }}
         .kpi-delta.down {{ color: {DANGER}; }}
         .kpi-delta.flat {{ color: {MUTED}; }}
 
-        /* Section headers --------------------------------------------- */
         .section-head {{ display: flex; align-items: center; gap: 10px; margin: 6px 0 2px; }}
         .section-head .dot {{ width: 10px; height: 10px; border-radius: 3px; background: linear-gradient(135deg, var(--primary), var(--accent)); }}
-        .section-head h3 {{ margin: 0; font-size: 1.15rem; font-weight: 700; color: {INK}; letter-spacing: -0.01em; }}
-
-        /* Bordered containers as cards */
-        div[data-testid="stVerticalBlockBorderWrapper"] {{
-            background: {SURFACE}; border-radius: 16px; border: 1px solid {BORDER} !important;
-            box-shadow: 0 8px 24px -18px rgba(15,23,42,0.18);
+        .section-head h3 {{
+            margin: 0; font-size: 1.15rem; font-weight: 700; color: {INK};
+            letter-spacing: -0.01em; font-family: {DISPLAY_STACK};
         }}
 
-        /* Sidebar ----------------------------------------------------- */
+        div[data-testid="stVerticalBlockBorderWrapper"] {{
+            background: {SURFACE}; border-radius: 14px; border: 1px solid {BORDER} !important;
+            box-shadow: 0 8px 24px -18px rgba(11,18,32,0.16);
+        }}
+
         section[data-testid="stSidebar"] {{
             background: {SURFACE};
             border-right: 1px solid {BORDER};
         }}
         .brand {{ display: flex; align-items: center; gap: 11px; padding: 4px 2px 14px; }}
         .brand-logo {{
-            width: 38px; height: 38px; border-radius: 11px; flex: none;
+            width: 38px; height: 38px; border-radius: 10px; flex: none;
             background: linear-gradient(135deg, {PRIMARY}, {ACCENT});
             display: flex; align-items: center; justify-content: center;
-            color: #fff; font-weight: 800; font-size: 1.1rem;
-            box-shadow: 0 8px 20px -8px rgba(99,102,241,0.7);
+            color: #fff; font-weight: 700; font-size: 0.95rem;
+            box-shadow: 0 8px 18px -10px rgba(15,118,110,0.65);
+            font-family: {FONT_STACK};
         }}
-        .brand-name {{ font-weight: 800; font-size: 1.05rem; color: {INK}; line-height: 1.1; }}
+        .brand-name {{ font-weight: 700; font-size: 1.05rem; color: {INK}; line-height: 1.1; }}
         .brand-sub {{ font-size: 0.72rem; color: {MUTED}; font-weight: 500; }}
 
-        /* Inputs */
         .stMultiSelect [data-baseweb="tag"] {{ background: {PRIMARY}; }}
         .stRadio [role="radiogroup"] {{ gap: 6px; }}
 
-        /* Metric tweaks for any native st.metric still used */
         div[data-testid="stMetric"] {{
-            background: {SURFACE}; border: 1px solid {BORDER}; border-radius: 14px;
-            padding: 14px 16px; box-shadow: 0 6px 18px -16px rgba(15,23,42,0.2);
+            background: {SURFACE}; border: 1px solid {BORDER}; border-radius: 12px;
+            padding: 14px 16px; box-shadow: 0 6px 18px -16px rgba(11,18,32,0.18);
         }}
 
         .divider-soft {{ height: 1px; background: {BORDER}; border: 0; margin: 22px 0; }}
+        .empty-state {{
+            border: 1px dashed {BORDER}; border-radius: 12px; padding: 28px 20px;
+            text-align: center; color: {MUTED}; background: rgba(255,255,255,0.6);
+            margin: 12px 0;
+        }}
         </style>
         """
     )
@@ -179,7 +188,7 @@ def hero(title: str, subtitle: str, badge: str) -> None:
 def brand(name: str, tagline: str) -> None:
     st.html(
         f'<div class="brand">'
-        f'<div class="brand-logo">◆</div>'
+        f'<div class="brand-logo">SP</div>'
         f'<div><div class="brand-name">{esc(name)}</div>'
         f'<div class="brand-sub">{esc(tagline)}</div></div>'
         f'</div>'
@@ -194,6 +203,10 @@ def section(title: str) -> None:
 
 def divider() -> None:
     st.html('<hr class="divider-soft">')
+
+
+def empty_state(message: str) -> None:
+    st.html(f'<div class="empty-state">{esc(message)}</div>')
 
 
 def kpi_cards(cards: list[dict]) -> None:

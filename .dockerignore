@@ -1,0 +1,17 @@
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+.pytest_cache/
+.git/
+.github/
+.idea/
+.vscode/
+*.egg-info/
+.DS_Store
+data/superstore.csv
+.streamlit/secrets.toml
+tests/
+requirements-dev.txt
+README.md

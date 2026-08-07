@@ -2,14 +2,15 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-from src.i18n import get_translator
-from src.styles import BORDER, CHART_SEQUENCE, INK, MUTED, PRIMARY
+from src.i18n import currency_symbol, get_translator
+from src.styles import ACCENT, BORDER, CHART_SEQUENCE, INK, MUTED, PRIMARY
 
-FONT = "Inter, -apple-system, Segoe UI, Roboto, sans-serif"
+FONT = "DM Sans, Segoe UI, Roboto, sans-serif"
+FILL_TEAL = "rgba(15,118,110,0.14)"
 
 
 def _style(fig: go.Figure, *, title: str = "") -> go.Figure:
-    """Apply shared SaaS chart theme: clean grid, brand font, transparent bg."""
+    """Apply shared chart theme: clean grid, brand font, transparent bg."""
     fig.update_layout(
         template="plotly_white",
         title=dict(text=title, font=dict(size=15, color=INK, family=FONT), x=0, xanchor="left"),
@@ -26,11 +27,12 @@ def _style(fig: go.Figure, *, title: str = "") -> go.Figure:
     return fig
 
 
-def top_products_chart(df: pd.DataFrame, by: str = "Quantity", t=None) -> go.Figure:
+def top_products_chart(df: pd.DataFrame, by: str = "Quantity", t=None, lang: str = "en") -> go.Figure:
     """Horizontal bar chart of top products."""
     t = t or get_translator("en")
+    symbol = currency_symbol(lang)
     metric = "Sales" if by == "Sales" else "Quantity"
-    label = t("chart_sales_axis") if by == "Sales" else t("quantity")
+    label = t("chart_sales_axis", symbol=symbol) if by == "Sales" else t("quantity")
     data = df.sort_values(metric, ascending=True)
 
     fig = px.bar(
@@ -48,38 +50,43 @@ def top_products_chart(df: pd.DataFrame, by: str = "Quantity", t=None) -> go.Fig
     return fig
 
 
-def monthly_revenue_chart(df: pd.DataFrame, t=None) -> go.Figure:
-    """Line chart of monthly revenue."""
+def monthly_revenue_chart(df: pd.DataFrame, t=None, lang: str = "en") -> go.Figure:
+    """Area chart of monthly revenue."""
     t = t or get_translator("en")
+    symbol = currency_symbol(lang)
     fig = px.area(
         df,
         x="order_month",
         y="Revenue",
         markers=True,
-        labels={"order_month": t("chart_month"), "Revenue": t("chart_revenue_axis")},
+        labels={
+            "order_month": t("chart_month"),
+            "Revenue": t("chart_revenue_axis", symbol=symbol),
+        },
         color_discrete_sequence=[PRIMARY],
     )
     fig.update_traces(
-        line=dict(width=2.5),
-        fillcolor="rgba(99,102,241,0.12)",
-        marker=dict(size=6),
-        hovertemplate="%{x}<br>%{y:$,.0f}<extra></extra>",
+        line=dict(width=2.5, color=PRIMARY),
+        fillcolor=FILL_TEAL,
+        marker=dict(size=6, color=ACCENT),
+        hovertemplate="%{x}<br>%{y:,.0f}<extra></extra>",
     )
     _style(fig, title=t("chart_monthly_revenue_title"))
     fig.update_layout(xaxis={"tickangle": -45}, height=400)
     return fig
 
 
-def category_profit_chart(df: pd.DataFrame, t=None) -> go.Figure:
+def category_profit_chart(df: pd.DataFrame, t=None, lang: str = "en") -> go.Figure:
     """Grouped bar chart of profit by category and sub-category."""
     t = t or get_translator("en")
+    symbol = currency_symbol(lang)
     fig = px.bar(
         df,
         x="Sub-Category",
         y="Profit",
         color="Category",
         labels={
-            "Profit": t("chart_profit_axis"),
+            "Profit": t("chart_profit_axis", symbol=symbol),
             "Sub-Category": t("chart_sub_category"),
             "Category": t("category"),
         },
@@ -93,13 +100,12 @@ def category_profit_chart(df: pd.DataFrame, t=None) -> go.Figure:
         height=440,
         barmode="relative",
         title_font=dict(size=17, color=INK, family=FONT),
-        # Legend below the plot so it never overlaps the top-left title.
         legend=dict(orientation="h", yanchor="top", y=-0.32, xanchor="center", x=0.5, title=""),
     )
     return fig
 
 
-def category_margin_chart(df: pd.DataFrame, t=None) -> go.Figure:
+def category_margin_chart(df: pd.DataFrame, t=None, lang: str = "en") -> go.Figure:
     """Bar chart of profit margin % per category."""
     t = t or get_translator("en")
     data = df.copy()
@@ -112,7 +118,7 @@ def category_margin_chart(df: pd.DataFrame, t=None) -> go.Figure:
         labels={"margin_pct": t("chart_margin_axis"), "Category": t("category")},
         text=data["margin_pct"].map(lambda v: f"{v:.1f}%"),
         color="margin_pct",
-        color_continuous_scale=["#EF4444", "#F59E0B", "#10B981"],
+        color_continuous_scale=["#DC2626", "#D97706", "#059669"],
     )
     fig.update_traces(
         textposition="outside",
@@ -122,9 +128,8 @@ def category_margin_chart(df: pd.DataFrame, t=None) -> go.Figure:
     )
     _style(fig, title=t("chart_margin_title"))
 
-    # Headroom so the outside % labels never clip (covers negative-margin bars).
-    lo = min(0.0, float(data["margin_pct"].min()))
-    hi = max(0.0, float(data["margin_pct"].max()))
+    lo = min(0.0, float(data["margin_pct"].min())) if len(data) else 0.0
+    hi = max(0.0, float(data["margin_pct"].max())) if len(data) else 0.0
     pad = (hi - lo) * 0.15 or 5.0
     fig.update_yaxes(range=[lo - pad, hi + pad], title_font=dict(size=12, color=MUTED))
     fig.update_xaxes(tickfont=dict(size=12, color=INK))

@@ -9,7 +9,7 @@ __pycache__/
 venv/
 env/
 
-# Dataset (download separately)
+# Full local Superstore dump (sample CSV is committed)
 data/superstore.csv
 
 # Streamlit
