@@ -1,8 +1,22 @@
+<div align="center">
+
 # SalesPulse Analytics
 
-Client-ready [Streamlit](https://streamlit.io/) sales dashboard: password-gated access, sample or uploaded CSV data, KPIs with period deltas, Plotly charts, and Excel/CSV export. Bilingual English / Português-BR.
+**A client-ready sales intelligence dashboard built with Streamlit.**
 
-Built with Python, pandas, Plotly, and openpyxl.
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-dashboard-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Tests](https://img.shields.io/badge/tests-pytest-0A9EDC?logo=pytest&logoColor=white)](#development)
+
+Turn CSV sales data into decision-ready KPIs, trends, product rankings, and exportable reports—available in English and Português-BR.
+
+</div>
+
+![SalesPulse Analytics dashboard](docs/assets/salespulse-dashboard.png)
+
+## Overview
+
+SalesPulse provides a secure, polished workspace for exploring a bundled sample dataset or a client-supplied CSV. Filter performance by date, region, and category, then export the exact view as CSV or a multi-sheet Excel workbook.
 
 ## Features
 
@@ -19,7 +33,7 @@ Built with Python, pandas, Plotly, and openpyxl.
 - Python 3.10+
 - Dependencies in `requirements.txt` (pandas, streamlit, plotly, openpyxl)
 
-## Setup
+## Quick start
 
 ```bash
 python -m venv .venv
@@ -41,6 +55,9 @@ streamlit run app.py
 ```
 
 Open `http://localhost:8501`, sign in with the password from secrets, then explore the sample data or upload a CSV.
+
+> [!TIP]
+> Use the bundled sample dataset to explore the full dashboard immediately—no external data source is required.
 
 ## CSV schema
 
